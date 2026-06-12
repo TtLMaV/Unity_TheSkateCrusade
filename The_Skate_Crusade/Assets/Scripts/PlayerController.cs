@@ -17,10 +17,14 @@ public class PlayerController : MonoBehaviour
     private bool pushRightPole;
     private bool brakeLeftPole;
     private bool brakeRightPole;
-    private bool pressingMoveInput;
+    private bool pressingAngleInput;
     private float playerVelocity;
     private float playerAngVelocity;
-    
+
+    // Animation Bits
+    [SerializeField] private Animator leftPoleAnimator;
+    [SerializeField] private Animator rightPoleAnimator;
+
     // Camera set variables
     [Header("Camera")]
     [SerializeField] private float mouseSensitivity = 1.0f;
@@ -29,6 +33,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float cameraMaxPitchAngle = 90f;
     private Vector2 lookVelocity;
     private float cameraXRotation;
+    private float cameraYRotation;
 
     // Do Look Input
     public void InputLook(InputAction.CallbackContext context)
@@ -86,18 +91,14 @@ public class PlayerController : MonoBehaviour
 
         // Do Player Movement
         DoPlayerMovement();
+
+        // Do Player Animations
+        DoPoleAnimations();
     }
 
     //
     void DoPlayerLook()
     {
-        /*
-        // Apply Player Rotation Yaw (Left / Right)
-        Vector3 playerRotation = playerRigidbody.rotation.eulerAngles;
-        float newYRotation = playerRotation.y + (lookVelocity.x * mouseSensitivity);
-        playerRigidbody.rotation = Quaternion.Euler(playerRotation.x, newYRotation, playerRotation.z);
-        */
-
         // Send Warning if Missing Pivot Object
         if (playerCamera == null)
         {
@@ -105,16 +106,21 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        //
+        cameraYRotation += (lookVelocity.x * mouseSensitivity);
+        cameraYRotation = Mathf.Clamp(cameraYRotation, -cameraMaxHorizontalAngle, cameraMaxHorizontalAngle);
+
         // Apply Player Rotation Pitch (Up / Down)
         cameraXRotation -= (lookVelocity.y * mouseSensitivity);
         cameraXRotation = Mathf.Clamp(cameraXRotation, -cameraMaxPitchAngle, cameraMaxPitchAngle);
-        playerCamera.transform.localRotation = Quaternion.Euler(cameraXRotation, 0, 0);
+        playerCamera.transform.localRotation = Quaternion.Euler(cameraXRotation, cameraYRotation, 0);
     }
 
     // 
     void DoPoleInput()
     {
-        pressingMoveInput = pushLeftPole || pushRightPole || brakeLeftPole || brakeRightPole;
+        // 
+        pressingAngleInput = (pushLeftPole != pushRightPole) || (brakeLeftPole != brakeRightPole);
 
         // Left Pole Push
         if (pushLeftPole)
@@ -145,6 +151,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    //
     void DoPlayerMovement()
     {
         // Handle Player Movement
@@ -155,7 +162,7 @@ public class PlayerController : MonoBehaviour
 
         // Handle Min Max Ang Velo And Easing
         playerAngVelocity = Mathf.Clamp(playerAngVelocity, -maxAngleVelo, maxAngleVelo);
-        if (!pressingMoveInput)
+        if (!pressingAngleInput)
         {
             if (Mathf.Abs(playerAngVelocity) > AngularLoss * Time.deltaTime * 2f)
             {
@@ -166,5 +173,15 @@ public class PlayerController : MonoBehaviour
                 playerAngVelocity = 0;
             }
         }
+    }
+
+    //
+    void DoPoleAnimations()
+    {
+        leftPoleAnimator.SetBool("Braking", brakeLeftPole);
+        leftPoleAnimator.SetBool("Pushing", pushLeftPole);
+        rightPoleAnimator.SetBool("Braking", brakeRightPole);
+        rightPoleAnimator.SetBool("Pushing", pushRightPole);
+        //print("LB: " + brakeLeftPole + "   LP: " + pushLeftPole + "   RB: " + brakeRightPole + "   RP: " + pushRightPole);
     }
 }
