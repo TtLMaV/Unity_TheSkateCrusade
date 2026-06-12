@@ -7,7 +7,7 @@
             "id": "df70fa95-8a34-4494-b137-73ab6b9c7d37",
             "actions": [
                 {
-                    "name": "LeftSkate",
+                    "name": "LeftSkatePush",
                     "type": "Button",
                     "id": "6c2ab1b8-8984-453a-af3d-a3c78ae1679a",
                     "expectedControlType": "",
@@ -16,9 +16,27 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "RightSkate",
+                    "name": "LeftSkateBrake",
+                    "type": "Button",
+                    "id": "9aa7fa13-04f2-4887-8601-954c79f4caee",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightSkatePush",
                     "type": "Button",
                     "id": "4c06aaca-45a3-4a2a-a7e9-fb929ecdce64",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightSkateBrake",
+                    "type": "Button",
+                    "id": "490ba43d-b453-4fcf-87aa-eac1ebe63aab",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -38,33 +56,44 @@
                 {
                     "name": "",
                     "id": "05f6913d-c316-48b2-a6bb-e225f14c7960",
-                    "path": "<Mouse>/leftButton",
+                    "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "LeftSkate",
+                    "action": "LeftSkatePush",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c243bd55-592d-41c4-9747-88fbb7e90a7e",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "LeftSkateBrake",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "dcd6b311-7a1c-42e7-ad13-415e8eb8e1de",
-                    "path": "<Mouse>/rightButton",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "RightSkate",
+                    "action": "RightSkatePush",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "5abf713a-a7cf-415d-8657-e357da696a23",
-                    "path": "<Gamepad>/rightStick",
+                    "id": "ebb5ae08-366a-4c5b-8ea8-2e033549472a",
+                    "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Gamepad",
-                    "action": "Look",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "RightSkateBrake",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -75,17 +104,6 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse;Touch",
-                    "action": "Look",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "92b3500e-2547-4b64-abcb-76bcc6840ce2",
-                    "path": "<Joystick>/{Hatswitch}",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Joystick",
                     "action": "Look",
                     "isComposite": false,
                     "isPartOfComposite": false
