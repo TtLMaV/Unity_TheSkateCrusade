@@ -22,8 +22,10 @@ public class PlayerController : MonoBehaviour
     private float playerAngVelocity;
 
     // Animation Bits
+    [Header("Animations")]
     [SerializeField] private Animator leftPoleAnimator;
     [SerializeField] private Animator rightPoleAnimator;
+    [SerializeField] private Animator swordAnimator;
 
     // Camera set variables
     [Header("Camera")]
@@ -34,6 +36,15 @@ public class PlayerController : MonoBehaviour
     private Vector2 lookVelocity;
     private float cameraXRotation;
     private float cameraYRotation;
+
+    [Header("Sword")]
+    [SerializeField] private float slashCD = 5.0f;
+    [SerializeField] private int finalSlashNumber = 1;
+    private float animStartTime;
+    private float curSlashCD;
+    private int slashNumber;
+    private bool startSlashing;
+    private bool slashing;
 
     // Do Look Input
     public void InputLook(InputAction.CallbackContext context)
@@ -70,6 +81,16 @@ public class PlayerController : MonoBehaviour
         brakeRightPole = context.performed;
     }
 
+    // Do Left Skate Pole Push
+    public void SwordAttack(InputAction.CallbackContext context)
+    {
+        // Attempt To Push Pole Via BOOL
+        if (!startSlashing)
+        {
+            startSlashing = context.performed;
+        }
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -91,6 +112,9 @@ public class PlayerController : MonoBehaviour
 
         // Do Player Movement
         DoPlayerMovement();
+
+        // Do Player Attack
+        DoPlayerAttack();
 
         // Do Player Animations
         DoPoleAnimations();
@@ -176,12 +200,62 @@ public class PlayerController : MonoBehaviour
     }
 
     //
+    void DoPlayerAttack()
+    {
+        string currentAnim = swordAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
+        float animTime = (Time.time - animStartTime) / 2f;
+
+        // Detect End Of Main Animation
+        if (currentAnim != "Sword_Idle" && animTime > 0.75f && startSlashing)
+        {
+            startSlashing = false;
+            slashing = false;
+            animStartTime = Time.time;
+
+            // Reset If At Final Slash
+            if (slashNumber == finalSlashNumber)
+                slashNumber = 0;
+        }
+
+        // Detect End Of Combo Chance
+        if (curSlashCD <= 0)
+        {
+            slashNumber = 0;
+        }
+
+        // Detect Start Of Slash
+        if (startSlashing && !slashing)
+        {
+            //
+            animStartTime = Time.time;
+            slashing = true;
+            slashNumber++;
+            slashNumber = Mathf.Clamp(slashNumber, 0, finalSlashNumber);
+
+            //
+            curSlashCD = slashCD;
+        }
+        
+        // Countdown Timer Till Combo End
+        if(curSlashCD > 0 && !startSlashing)
+        {
+            curSlashCD -= Time.deltaTime;
+        }
+    }
+
+    //
     void DoPoleAnimations()
     {
+        // Animate Poles
         leftPoleAnimator.SetBool("Braking", brakeLeftPole);
         leftPoleAnimator.SetBool("Pushing", pushLeftPole);
         rightPoleAnimator.SetBool("Braking", brakeRightPole);
         rightPoleAnimator.SetBool("Pushing", pushRightPole);
-        //print("LB: " + brakeLeftPole + "   LP: " + pushLeftPole + "   RB: " + brakeRightPole + "   RP: " + pushRightPole);
+
+        // Animate Sword
+        swordAnimator.SetInteger("Swing", slashNumber);
+        float animTime = (Time.time - animStartTime) / 2f;
+        swordAnimator.SetFloat("TTime", animTime);
+
     }
 }
