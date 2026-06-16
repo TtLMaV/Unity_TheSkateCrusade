@@ -258,4 +258,14 @@ public class PlayerController : MonoBehaviour
         swordAnimator.SetFloat("TTime", animTime);
 
     }
+
+    // 
+    private void OnTriggerEnter(Collider other)
+    {
+        if(slashing && other.tag == "Enemy")
+        {
+            Enemy_Spawner.numberOfEnemies--;
+            Destroy(other.gameObject);
+        }
+    }
 }

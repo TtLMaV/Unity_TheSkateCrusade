@@ -75,11 +75,33 @@
                 },
                 {
                     "name": "",
+                    "id": "d6c29d9f-8030-4583-9585-e5c87a5cebdd",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";GamePad",
+                    "action": "LeftSkatePush",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "c243bd55-592d-41c4-9747-88fbb7e90a7e",
                     "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
+                    "action": "LeftSkateBrake",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "84e14c9f-37ea-4ccd-8d81-8eb0adf64e3b",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";GamePad",
                     "action": "LeftSkateBrake",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -97,11 +119,33 @@
                 },
                 {
                     "name": "",
+                    "id": "b7e71aae-c55b-423a-a0a4-11031d46ed05",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";GamePad",
+                    "action": "RightSkatePush",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "ebb5ae08-366a-4c5b-8ea8-2e033549472a",
                     "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
+                    "action": "RightSkateBrake",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "989302ee-75e9-4fba-beff-b3b5d60dd143",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";GamePad",
                     "action": "RightSkateBrake",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -119,11 +163,22 @@
                 },
                 {
                     "name": "",
-                    "id": "067fe509-999a-462b-8044-58f9804bc003",
-                    "path": "",
+                    "id": "72f682d2-9890-41b9-8ca2-ea7a521317cc",
+                    "path": "<Gamepad>/leftStick",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";GamePad",
+                    "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "067fe509-999a-462b-8044-58f9804bc003",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";GamePad",
                     "action": "Attack",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -154,6 +209,17 @@
                 },
                 {
                     "devicePath": "<Mouse>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "GamePad",
+            "bindingGroup": "GamePad",
+            "devices": [
+                {
+                    "devicePath": "<Gamepad>",
                     "isOptional": false,
                     "isOR": false
                 }
