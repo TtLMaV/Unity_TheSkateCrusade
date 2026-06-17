@@ -102,7 +102,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         // Do Player Camera Rotation
         DoPlayerLook();
@@ -157,29 +157,29 @@ public class PlayerController : MonoBehaviour
             // Left Pole Push
             if (pushLeftPole)
             {
-                playerAngVelocity += pushRotationSpeed * Time.deltaTime;
-                playerVelocity += pushForwardSpeed * Time.deltaTime;
+                playerAngVelocity += pushRotationSpeed * Time.fixedDeltaTime;
+                playerVelocity += pushForwardSpeed * Time.fixedDeltaTime;
             }
 
             // Right Pole Push
             if (pushRightPole)
             {
-                playerAngVelocity -= pushRotationSpeed * Time.deltaTime;
-                playerVelocity += pushForwardSpeed * Time.deltaTime;
+                playerAngVelocity -= pushRotationSpeed * Time.fixedDeltaTime;
+                playerVelocity += pushForwardSpeed * Time.fixedDeltaTime;
             }
 
             // Left Pole Brake
             if (brakeLeftPole)
             {
-                playerAngVelocity -= brakeRotationSpeed * Time.deltaTime;
-                playerVelocity -= brakeBackwardsSpeed * Time.deltaTime;
+                playerAngVelocity -= brakeRotationSpeed * Time.fixedDeltaTime;
+                playerVelocity -= brakeBackwardsSpeed * Time.fixedDeltaTime;
             }
 
             // Right Pole Brake
             if (brakeRightPole)
             {
-                playerAngVelocity += brakeRotationSpeed * Time.deltaTime;
-                playerVelocity -= brakeBackwardsSpeed * Time.deltaTime;
+                playerAngVelocity += brakeRotationSpeed * Time.fixedDeltaTime;
+                playerVelocity -= brakeBackwardsSpeed * Time.fixedDeltaTime;
             }
         }
     }
@@ -187,8 +187,13 @@ public class PlayerController : MonoBehaviour
     //
     void DoPlayerMovement()
     {
+        if(playerRigidbody.linearVelocity.magnitude - playerVelocity <= -1f)
+        {
+            playerVelocity = playerRigidbody.linearVelocity.magnitude;
+        }
+
         // Handle Player Movement
-        playerVelocity = Mathf.Clamp(playerVelocity, 0, maxForwardSpeed);
+        playerVelocity = Mathf.Clamp(playerVelocity, -2f, maxForwardSpeed);
         Vector3 forwardsSpeed = playerRigidbody.transform.forward * playerVelocity;
         playerRigidbody.linearVelocity = new Vector3(forwardsSpeed.x, playerRigidbody.linearVelocity.y, forwardsSpeed.z);
         playerRigidbody.angularVelocity = new Vector3(0f, playerAngVelocity, 0f);
@@ -197,9 +202,9 @@ public class PlayerController : MonoBehaviour
         playerAngVelocity = Mathf.Clamp(playerAngVelocity, -maxAngleVelo, maxAngleVelo);
         if (!pressingAngleInput)
         {
-            if (Mathf.Abs(playerAngVelocity) > AngularLoss * Time.deltaTime * 2f)
+            if (Mathf.Abs(playerAngVelocity) > AngularLoss * Time.fixedDeltaTime * 2f)
             {
-                playerAngVelocity -= Mathf.Sign(playerAngVelocity) * Time.deltaTime * AngularLoss;
+                playerAngVelocity -= Mathf.Sign(playerAngVelocity) * Time.fixedDeltaTime * AngularLoss;
             }
             else
             {
@@ -222,8 +227,6 @@ public class PlayerController : MonoBehaviour
         // Detect Start Of Slash
         if (startSlashing && !slashing)
         {
-            print("bazinga");
-
             //
             animStartTime = Time.time;
             slashing = true;
@@ -236,13 +239,11 @@ public class PlayerController : MonoBehaviour
 
         //
         string currentAnim = swordAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
-        float animTime = (Time.time - animStartTime) / 2f;
+        float animTime = (Time.time - animStartTime) / 1f;
 
         // Detect End Of Main Animation
-        if (currentAnim != "Sword_Idle" && animTime > 0.75f && startSlashing)
+        if (currentAnim != "Sword_Idle" && animTime > 0.65f && startSlashing)
         {
-            print("papzorpo");
-
             startSlashing = false;
             slashing = false;
 
@@ -254,7 +255,7 @@ public class PlayerController : MonoBehaviour
         // Countdown Timer Till Combo End
         if (curSlashCD > 0 && !startSlashing)
         {
-            curSlashCD -= Time.deltaTime;
+            curSlashCD -= Time.fixedDeltaTime;
         }
     }
 
@@ -273,7 +274,7 @@ public class PlayerController : MonoBehaviour
 
         // Animate Sword
         swordAnimator.SetInteger("Swing", slashNumber);
-        float animTime = (Time.time - animStartTime) / 2f;
+        float animTime = (Time.time - animStartTime) / 1f;
         animTime = Mathf.Clamp(animTime, 0f, 0.98f);
         swordAnimator.SetFloat("TTime", animTime);
 
