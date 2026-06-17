@@ -17,7 +17,10 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Always Update Desitnation to Be the Players Position
-        agent.SetDestination(player.transform.position);
+        // Always Update Destination to Be the Players Position
+        Vector3 awayFromPlayer = Vector3.Normalize(transform.position - player.transform.position) * 2f;
+        NavMesh.SamplePosition(transform.position + awayFromPlayer, out NavMeshHit hit, 2f, 7);
+        if(hit.hit)
+            agent.SetDestination(hit.position);
     }
 }

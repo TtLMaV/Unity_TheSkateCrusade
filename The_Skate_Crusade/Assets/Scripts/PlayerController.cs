@@ -143,35 +143,44 @@ public class PlayerController : MonoBehaviour
     // 
     void DoPoleInput()
     {
-        // 
-        pressingAngleInput = (pushLeftPole != pushRightPole) || (brakeLeftPole != brakeRightPole);
-
-        // Left Pole Push
-        if (pushLeftPole)
+        //
+        if (slashing)
         {
-            playerAngVelocity += pushRotationSpeed * Time.deltaTime;
-            playerVelocity += pushForwardSpeed * Time.deltaTime;
+            //
+            pressingAngleInput = false;
         }
-
-        // Right Pole Push
-        if (pushRightPole)
+        else
         {
-            playerAngVelocity -= pushRotationSpeed * Time.deltaTime;
-            playerVelocity += pushForwardSpeed * Time.deltaTime;
-        }
+            // 
+            pressingAngleInput = (pushLeftPole != pushRightPole) || (brakeLeftPole != brakeRightPole);
 
-        // Left Pole Brake
-        if (brakeLeftPole)
-        {
-            playerAngVelocity -= brakeRotationSpeed * Time.deltaTime;
-            playerVelocity -= brakeBackwardsSpeed * Time.deltaTime;
-        }
+            // Left Pole Push
+            if (pushLeftPole)
+            {
+                playerAngVelocity += pushRotationSpeed * Time.deltaTime;
+                playerVelocity += pushForwardSpeed * Time.deltaTime;
+            }
 
-        // Right Pole Brake
-        if (brakeRightPole)
-        {
-            playerAngVelocity += brakeRotationSpeed * Time.deltaTime;
-            playerVelocity -= brakeBackwardsSpeed * Time.deltaTime;
+            // Right Pole Push
+            if (pushRightPole)
+            {
+                playerAngVelocity -= pushRotationSpeed * Time.deltaTime;
+                playerVelocity += pushForwardSpeed * Time.deltaTime;
+            }
+
+            // Left Pole Brake
+            if (brakeLeftPole)
+            {
+                playerAngVelocity -= brakeRotationSpeed * Time.deltaTime;
+                playerVelocity -= brakeBackwardsSpeed * Time.deltaTime;
+            }
+
+            // Right Pole Brake
+            if (brakeRightPole)
+            {
+                playerAngVelocity += brakeRotationSpeed * Time.deltaTime;
+                playerVelocity -= brakeBackwardsSpeed * Time.deltaTime;
+            }
         }
     }
 
@@ -202,20 +211,7 @@ public class PlayerController : MonoBehaviour
     //
     void DoPlayerAttack()
     {
-        string currentAnim = swordAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
-        float animTime = (Time.time - animStartTime) / 2f;
-
-        // Detect End Of Main Animation
-        if (currentAnim != "Sword_Idle" && animTime > 0.75f && startSlashing)
-        {
-            startSlashing = false;
-            slashing = false;
-            animStartTime = Time.time;
-
-            // Reset If At Final Slash
-            if (slashNumber == finalSlashNumber)
-                slashNumber = 0;
-        }
+        
 
         // Detect End Of Combo Chance
         if (curSlashCD <= 0)
@@ -226,6 +222,8 @@ public class PlayerController : MonoBehaviour
         // Detect Start Of Slash
         if (startSlashing && !slashing)
         {
+            print("bazinga");
+
             //
             animStartTime = Time.time;
             slashing = true;
@@ -235,9 +233,26 @@ public class PlayerController : MonoBehaviour
             //
             curSlashCD = slashCD;
         }
-        
+
+        //
+        string currentAnim = swordAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
+        float animTime = (Time.time - animStartTime) / 2f;
+
+        // Detect End Of Main Animation
+        if (currentAnim != "Sword_Idle" && animTime > 0.75f && startSlashing)
+        {
+            print("papzorpo");
+
+            startSlashing = false;
+            slashing = false;
+
+            // Reset If At Final Slash
+            if (slashNumber == finalSlashNumber)
+                slashNumber = 0;
+        }
+
         // Countdown Timer Till Combo End
-        if(curSlashCD > 0 && !startSlashing)
+        if (curSlashCD > 0 && !startSlashing)
         {
             curSlashCD -= Time.deltaTime;
         }
@@ -246,15 +261,20 @@ public class PlayerController : MonoBehaviour
     //
     void DoPoleAnimations()
     {
-        // Animate Poles
+        // Animate Left Pole
         leftPoleAnimator.SetBool("Braking", brakeLeftPole);
         leftPoleAnimator.SetBool("Pushing", pushLeftPole);
+        leftPoleAnimator.SetBool("Attacking", slashing);
+
+        // Animate Right Pole
         rightPoleAnimator.SetBool("Braking", brakeRightPole);
         rightPoleAnimator.SetBool("Pushing", pushRightPole);
+        rightPoleAnimator.SetBool("Attacking", slashing);
 
         // Animate Sword
         swordAnimator.SetInteger("Swing", slashNumber);
         float animTime = (Time.time - animStartTime) / 2f;
+        animTime = Mathf.Clamp(animTime, 0f, 0.98f);
         swordAnimator.SetFloat("TTime", animTime);
 
     }
