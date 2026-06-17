@@ -6,11 +6,19 @@ public class Enemy : MonoBehaviour
     private NavMeshAgent agent;
     private GameObject player;
     private Rigidbody rb;
+    [Header("AI")]
     [SerializeField] private float newPositionCDMin;
     [SerializeField] private float newPositionCDMax;
     private float curNewPositionCD;
     [SerializeField] private float newPositionRange;
     [SerializeField] private float avoidPlayerDistance;
+
+    [Header("Death")]
+    [SerializeField] private GameObject[] gibs;
+    [SerializeField] private int numberOfDeathGibs;
+    [SerializeField] private GameObject bloodParticlesPrefab;
+    [SerializeField] private GameObject splatterPrefab;
+    [SerializeField] private int numberOfDeathSplatter;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -42,7 +50,7 @@ public class Enemy : MonoBehaviour
             rb.linearVelocity = Vector3.zero;
     }
 
-
+    //
     private void RunFromPlayer()
     {
         //
@@ -51,7 +59,8 @@ public class Enemy : MonoBehaviour
         if (hit.hit)
             agent.SetDestination(hit.position);
     }
-
+    
+    //
     private void RandomPatrol()
     {
         if (curNewPositionCD <= 0)
@@ -75,7 +84,29 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    //
+    public void Death()
+    {
+        //
+        for(int i = 0; i < numberOfDeathGibs; i++)
+        {
+            int newGibID = Random.Range(0, gibs.Length);
+            Vector3 posOffset = new Vector3(Random.Range(-0.2f, 0.2f), Random.Range(-0.2f, 0.2f), Random.Range(-0.2f, 0.2f));
+            Instantiate(gibs[newGibID], transform.position + posOffset, Quaternion.identity);
+        }
+        for (int i = 0; i < numberOfDeathSplatter; i++)
+        {
+            Vector3 posOffset = new Vector3(Random.Range(-0.2f, 0.2f), Random.Range(-0.2f, 0.2f), Random.Range(-0.2f, 0.2f));
+            Instantiate(splatterPrefab, transform.position + posOffset, Quaternion.identity);
+        }
+        Instantiate(bloodParticlesPrefab, transform.position, Quaternion.identity);
 
+        //
+        Enemy_Spawner.numberOfEnemies--;
+        Destroy(gameObject);
+    }
+
+    //
     private void OnDrawGizmos()
     {
         if (agent != null)

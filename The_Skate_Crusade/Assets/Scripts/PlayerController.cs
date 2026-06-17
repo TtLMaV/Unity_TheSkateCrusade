@@ -285,8 +285,8 @@ public class PlayerController : MonoBehaviour
     {
         if(slashing && other.tag == "Enemy")
         {
-            Enemy_Spawner.numberOfEnemies--;
-            Destroy(other.gameObject);
+            Enemy otherScript = other.GetComponent<Enemy>();
+            otherScript.Death();
         }
     }
 }
