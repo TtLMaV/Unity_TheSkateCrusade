@@ -96,7 +96,7 @@ public class Enemy : MonoBehaviour
         }
         for (int i = 0; i < numberOfDeathSplatter; i++)
         {
-            Vector3 posOffset = new Vector3(Random.Range(-0.2f, 0.2f), Random.Range(-0.2f, 0.2f), Random.Range(-0.2f, 0.2f));
+            Vector3 posOffset = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f));
             Instantiate(splatterPrefab, transform.position + posOffset, Quaternion.identity);
         }
         Instantiate(bloodParticlesPrefab, transform.position, Quaternion.identity);
