@@ -4,6 +4,7 @@ public class Enemy_Spawner : MonoBehaviour
 {
     public static int numberOfEnemies;
     public static int maxNumberOfEnemies;
+    public static bool revoltStarted;
     [SerializeField] public int maxEnemies;
     [SerializeField] private float minSpawnDelay = 5f;
     [SerializeField] private float maxSpawnDelay = 5f;
@@ -28,6 +29,7 @@ public class Enemy_Spawner : MonoBehaviour
     {
         curSpawnDelay = Random.Range(minSpawnDelay, maxSpawnDelay);
         numberOfEnemies = 0;
+        revoltStarted = false;
     }
 
     // Update is called once per frame
@@ -49,6 +51,10 @@ public class Enemy_Spawner : MonoBehaviour
 
             curSpawnDelay = Random.Range(minSpawnDelay, maxSpawnDelay);
         }
+
+        // Start Revlot When Enemies Spawned
+        if(numberOfEnemies == maxNumberOfEnemies)
+            revoltStarted = true;
     }
 
     private void OnDrawGizmosSelected()

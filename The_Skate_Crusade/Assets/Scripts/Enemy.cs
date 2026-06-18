@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AdaptivePerformance;
 using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
@@ -12,6 +13,10 @@ public class Enemy : MonoBehaviour
     private float curNewPositionCD;
     [SerializeField] private float newPositionRange;
     [SerializeField] private float avoidPlayerDistance;
+    [SerializeField] private Animator enemyAnimations;
+    [SerializeField] private AudioSource screamSFX;
+    private bool animateTop;
+    private bool closeEnough;
 
     [Header("Death")]
     [SerializeField] private GameObject[] gibs;
@@ -19,6 +24,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private GameObject bloodParticlesPrefab;
     [SerializeField] private GameObject splatterPrefab;
     [SerializeField] private int numberOfDeathSplatter;
+    [SerializeField] private GameObject deathSFX;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -27,27 +33,60 @@ public class Enemy : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player");
         rb = GetComponent<Rigidbody>();
+
+        //
+        screamSFX.pitch = Random.Range(0.8f, 1.4f);
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Always Update Destination to Be the Players Position
+        agent.speed = Enemy_Spawner.revoltStarted ? 7 : 3;
+
+        RandomPatrol();
+        CreateAnimations();
+
+        if (player == null)
+            return;
+
         float playerDistance = Vector3.Distance(transform.position, player.transform.position);
-        if (playerDistance < avoidPlayerDistance)
+        if (!Enemy_Spawner.revoltStarted)
         {
-            //
-            RunFromPlayer();
+            // Always Update Destination to Be the Players Position
+            if (playerDistance < avoidPlayerDistance)
+            {
+                //
+                RunFromPlayer();
+                animateTop = true;
+            }
+            else
+            {
+                //
+                RandomPatrol();
+                animateTop = false;
+            }
         }
         else
         {
-            //
-            RandomPatrol();
+            agent.SetDestination(player.transform.position);
+            closeEnough = playerDistance < 5f;
+            animateTop = closeEnough;
         }
 
         //
         if (rb != null)
             rb.linearVelocity = Vector3.zero;
+
+
+    }
+
+    //
+    private void CreateAnimations()
+    {
+        // Do Animations
+        enemyAnimations.SetBool("Walking", agent.desiredVelocity.magnitude > 0.5f);
+        enemyAnimations.SetLayerWeight(1, animateTop ? 1f : 0f);
+        enemyAnimations.SetBool("Attacking", closeEnough);
     }
 
     //
@@ -100,11 +139,14 @@ public class Enemy : MonoBehaviour
             Instantiate(splatterPrefab, transform.position + posOffset, Quaternion.identity);
         }
         Instantiate(bloodParticlesPrefab, transform.position, Quaternion.identity);
+        Instantiate(deathSFX, transform.position, Quaternion.identity);
 
         //
+        PlayerController.Score += Enemy_Spawner.revoltStarted ? 5 : 100;
         Enemy_Spawner.numberOfEnemies--;
         Destroy(gameObject);
     }
+
 
     //
     private void OnDrawGizmos()

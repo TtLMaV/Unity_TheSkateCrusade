@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,6 +13,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float maxForwardSpeed = 15f;
     [SerializeField] private float maxAngleVelo = 1.0f;
     [SerializeField] private float AngularLoss = 0.1f;
+    [SerializeField] private AudioSource pushSFX;
+    private float pushSFXVol;
+    [SerializeField] private AudioSource brakeSFX;
+    private float brakeSFXVol;
     private Rigidbody playerRigidbody;
     private bool pushLeftPole;
     private bool pushRightPole;
@@ -40,11 +45,14 @@ public class PlayerController : MonoBehaviour
     [Header("Sword")]
     [SerializeField] private float slashCD = 5.0f;
     [SerializeField] private int finalSlashNumber = 1;
+    [SerializeField] private AudioSource SwordSFX;
     private float animStartTime;
     private float curSlashCD;
     private int slashNumber;
     private bool startSlashing;
     private bool slashing;
+    public static float Health = 100.0f;
+    public static int Score;
 
     // Do Look Input
     public void InputLook(InputAction.CallbackContext context)
@@ -88,6 +96,8 @@ public class PlayerController : MonoBehaviour
         if (!startSlashing)
         {
             startSlashing = context.performed;
+            SwordSFX.pitch = Random.Range(0.8f, 1.3f);
+            SwordSFX.Play();
         }
     }
 
@@ -99,6 +109,16 @@ public class PlayerController : MonoBehaviour
 
         // Lock Cursor By Default
         Cursor.lockState = CursorLockMode.Locked;
+
+        //
+        pushSFXVol = pushSFX.volume;
+        brakeSFXVol = brakeSFX.volume;
+        pushSFX.volume = 0f;
+        brakeSFX.volume = 0f;
+
+        //
+        Health = 100.0f;
+        Score = 0;
     }
 
     // Update is called once per frame
@@ -110,6 +130,9 @@ public class PlayerController : MonoBehaviour
         // Do Pole Input
         DoPoleInput();
 
+        // asd
+        DoPoleSFX();
+
         // Do Player Movement
         DoPlayerMovement();
 
@@ -118,6 +141,12 @@ public class PlayerController : MonoBehaviour
 
         // Do Player Animations
         DoPoleAnimations();
+
+        //
+        if(Health <= 0)
+        {
+            SceneManager.LoadScene("MainMenu");
+        }
     }
 
     //
@@ -183,6 +212,39 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+    //
+    void DoPoleSFX()
+    {
+        //
+        float desPushVol = 0f;
+        float desBrakeVol = 0f;
+
+        //
+        if (!slashing)
+        {
+            if (pushLeftPole || pushRightPole)
+            {
+                desPushVol = pushSFXVol;
+            }
+            if (brakeLeftPole || brakeRightPole)
+            {
+                desBrakeVol = brakeSFXVol;
+            }
+        }
+        if (!pushLeftPole && !pushRightPole)
+        {
+            desPushVol = 0f;
+        }
+        if (!brakeLeftPole && !brakeRightPole)
+        {
+            desBrakeVol = 0f;
+        }
+
+        pushSFX.volume = Mathf.Lerp(pushSFX.volume, desPushVol, Time.fixedDeltaTime * 1.5f);
+        brakeSFX.volume = Mathf.Lerp(brakeSFX.volume, desBrakeVol, Time.fixedDeltaTime * 1.5f);
+    }
+
 
     //
     void DoPlayerMovement()
