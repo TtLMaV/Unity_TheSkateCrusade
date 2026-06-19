@@ -2,9 +2,7 @@ using UnityEngine;
 
 public class Enemy_Spawner : MonoBehaviour
 {
-    public static int numberOfEnemies;
-    public static int maxNumberOfEnemies;
-    public static bool revoltStarted;
+    private SpawnController _spawnController;
     [SerializeField] public int maxEnemies;
     [SerializeField] private float minSpawnDelay = 5f;
     [SerializeField] private float maxSpawnDelay = 5f;
@@ -16,20 +14,27 @@ public class Enemy_Spawner : MonoBehaviour
     // Push this value to all other instance
     private void OnValidate()
     {
-        maxNumberOfEnemies = maxEnemies;
+        _spawnController = GameObject.FindAnyObjectByType<SpawnController>();
+        _spawnController.maxNumberOfEnemies = maxEnemies;
         Enemy_Spawner[] allSpawners = FindObjectsByType<Enemy_Spawner>();
         foreach (Enemy_Spawner spawner in allSpawners)
         {
-            spawner.maxEnemies = maxNumberOfEnemies;
+            spawner.maxEnemies = _spawnController.maxNumberOfEnemies;
         }
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        OnValidate();
         curSpawnDelay = Random.Range(minSpawnDelay, maxSpawnDelay);
-        numberOfEnemies = 0;
-        revoltStarted = false;
+        _spawnController.numberOfEnemies = 0;
+        _spawnController.revoltStarted = false;
+    }
+
+    private void Awake()
+    {
+        Start();
     }
 
     // Update is called once per frame
@@ -43,9 +48,9 @@ public class Enemy_Spawner : MonoBehaviour
             bool nearbyPlayer = Physics.CheckSphere(transform.position, playerCheckDistance, playerLayerMask);
 
             // If ther is no nearby player allow enemy spawn
-            if (!nearbyPlayer && numberOfEnemies < maxEnemies)
+            if (!nearbyPlayer && _spawnController.numberOfEnemies < maxEnemies)
             {
-                numberOfEnemies++;
+                _spawnController.numberOfEnemies++;
                 Instantiate(enemyToSpawn, transform.position, Quaternion.identity);
             }
 
@@ -53,11 +58,11 @@ public class Enemy_Spawner : MonoBehaviour
         }
 
         // Start Revlot When Enemies Spawned
-        if(numberOfEnemies == maxNumberOfEnemies)
-            revoltStarted = true;
+        if(_spawnController.numberOfEnemies == _spawnController.maxNumberOfEnemies)
+            _spawnController.revoltStarted = true;
 
         //
-        if(revoltStarted)
+        if(_spawnController.revoltStarted)
         {
             minSpawnDelay = 0f;
             maxSpawnDelay = 0.1f;

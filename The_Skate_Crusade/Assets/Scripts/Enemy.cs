@@ -17,6 +17,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private AudioSource screamSFX;
     private bool animateTop;
     private bool closeEnough;
+    private SpawnController _spawnController;
 
     [Header("Death")]
     [SerializeField] private GameObject[] gibs;
@@ -29,6 +30,9 @@ public class Enemy : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        //
+        _spawnController = FindAnyObjectByType<SpawnController>();
+
         // Grab Agent Component And Player Reference
         agent = GetComponent<NavMeshAgent>();
         player = GameObject.FindGameObjectWithTag("Player");
@@ -41,7 +45,7 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        agent.speed = Enemy_Spawner.revoltStarted ? 7 : 3;
+        agent.speed = _spawnController.revoltStarted ? 7 : 3;
 
         RandomPatrol();
         CreateAnimations();
@@ -50,7 +54,7 @@ public class Enemy : MonoBehaviour
             return;
 
         float playerDistance = Vector3.Distance(transform.position, player.transform.position);
-        if (!Enemy_Spawner.revoltStarted)
+        if (!_spawnController.revoltStarted)
         {
             // Always Update Destination to Be the Players Position
             if (playerDistance < avoidPlayerDistance)
@@ -142,8 +146,8 @@ public class Enemy : MonoBehaviour
         Instantiate(deathSFX, transform.position, Quaternion.identity);
 
         //
-        PlayerController.Score += Enemy_Spawner.revoltStarted ? 5 : 100;
-        Enemy_Spawner.numberOfEnemies--;
+        PlayerController.Score += _spawnController.revoltStarted ? 5 : 100;
+        _spawnController.numberOfEnemies--;
         Destroy(gameObject);
     }
 

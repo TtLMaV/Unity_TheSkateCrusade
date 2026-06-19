@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour
     private bool pressingAngleInput;
     private float playerVelocity;
     private float playerAngVelocity;
+    private SpawnController _spawnController;
 
     // Animation Bits
     [Header("Animations")]
@@ -64,7 +65,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float specialCD;
     private float curSpecialCD;
     [SerializeField] private float chargeForwardSpped = 25f;
-    public static int coolPoints;
+    public int coolPoints;
     [SerializeField] private int coolPointsPerCharge = 10;
 
     // Do Look Input
@@ -144,6 +145,9 @@ public class PlayerController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        //
+        _spawnController = FindAnyObjectByType<SpawnController>();
+
         // Grab Rigidbody From GO
         playerRigidbody = GetComponent<Rigidbody>();
 
@@ -425,7 +429,7 @@ public class PlayerController : MonoBehaviour
 
     public void AddCoolPoint()
     {
-        if (!Enemy_Spawner.revoltStarted)
+        if (!_spawnController.revoltStarted)
         {
             coolPoints++;
             coolPoints = Mathf.Clamp(coolPoints, 0, coolPointsPerCharge);
