@@ -9,6 +9,7 @@ public class UIController : MonoBehaviour
     [SerializeField] private Slider peasantSlider;
     [SerializeField] private TextMeshProUGUI health_Text;
     [SerializeField] private Image health_Bar;
+    [SerializeField] private Image coolPoints;
     [SerializeField] private TextMeshProUGUI score_Text;
     [SerializeField] private GameObject gamePanel;
     [SerializeField] private GameObject menuPanel;
@@ -45,6 +46,9 @@ public class UIController : MonoBehaviour
         float playerhealth = Mathf.Ceil(PlayerController.Health);
         health_Text.text = playerhealth.ToString();
         health_Bar.fillAmount = playerhealth / 100f;
+
+        //
+        coolPoints.fillAmount = ((float)PlayerController.coolPoints) / (10f);
 
         //
         score_Text.text = "SCORE: " + PlayerController.Score;

@@ -56,6 +56,17 @@ public class PlayerController : MonoBehaviour
     public static float Health = 100.0f;
     public static int Score;
 
+    [Header("Special Attack")]
+    [SerializeField] private GameObject fireBall;
+    private bool specialCharge;
+    [SerializeField] private float specialTime;
+    private float curSpecialTime;
+    [SerializeField] private float specialCD;
+    private float curSpecialCD;
+    [SerializeField] private float chargeForwardSpped = 25f;
+    public static int coolPoints;
+    [SerializeField] private int coolPointsPerCharge = 10;
+
     // Do Look Input
     public void InputLook(InputAction.CallbackContext context)
     {
@@ -95,11 +106,24 @@ public class PlayerController : MonoBehaviour
     public void SwordAttack(InputAction.CallbackContext context)
     {
         // Attempt To Push Pole Via BOOL
-        if (!startSlashing)
+        if (!startSlashing && !specialCharge)
         {
             startSlashing = context.performed;
             SwordSFX.pitch = Random.Range(0.8f, 1.3f);
             SwordSFX.Play();
+        }
+    }
+
+    // Do Charge Attack Special
+    public void ChargeAttack(InputAction.CallbackContext context)
+    {
+        // Attempt To Charge Attack
+        if (!specialCharge && curSpecialCD <= 0 && coolPoints >= coolPointsPerCharge)
+        {
+            coolPoints -= coolPointsPerCharge;
+            specialCharge = true;
+            curSpecialTime = specialTime;
+            curSpecialCD = specialCD;
         }
     }
 
@@ -133,6 +157,7 @@ public class PlayerController : MonoBehaviour
         brakeSFX.volume = 0f;
 
         // Reset Statics
+        coolPoints = 0;
         Health = 100.0f;
         Score = 0;
         Time.timeScale = 1f;
@@ -151,6 +176,9 @@ public class PlayerController : MonoBehaviour
 
         // asd
         DoPoleSFX();
+
+        //
+        DoPlayerCharge();
 
         // Do Player Movement
         DoPlayerMovement();
@@ -264,6 +292,28 @@ public class PlayerController : MonoBehaviour
         brakeSFX.volume = Mathf.Lerp(brakeSFX.volume, desBrakeVol, Time.fixedDeltaTime * 1.5f);
     }
 
+    //
+    private void DoPlayerCharge()
+    {
+        fireBall.SetActive(specialCharge);
+
+        //
+        if (!specialCharge)
+        {
+            curSpecialCD -= Time.fixedDeltaTime;
+            return;
+
+        }
+
+        //
+        curSpecialTime -= Time.fixedDeltaTime;
+
+        if(curSpecialTime <= 0)
+        {
+            specialCharge = false;
+            return;
+        }
+    }
 
     //
     void DoPlayerMovement()
@@ -275,6 +325,7 @@ public class PlayerController : MonoBehaviour
 
         // Handle Player Movement
         playerVelocity = Mathf.Clamp(playerVelocity, -2f, maxForwardSpeed);
+        playerVelocity = specialCharge ? chargeForwardSpped : playerVelocity;
         Vector3 forwardsSpeed = playerRigidbody.transform.forward * playerVelocity;
         playerRigidbody.linearVelocity = new Vector3(forwardsSpeed.x, playerRigidbody.linearVelocity.y, forwardsSpeed.z);
         playerRigidbody.angularVelocity = new Vector3(0f, playerAngVelocity, 0f);
@@ -364,10 +415,20 @@ public class PlayerController : MonoBehaviour
     // 
     private void OnTriggerEnter(Collider other)
     {
-        if(slashing && other.tag == "Enemy")
+        if((slashing || specialCharge) && other.tag == "Enemy")
         {
             Enemy otherScript = other.GetComponent<Enemy>();
+            AddCoolPoint();
             otherScript.Death();
+        }
+    }
+
+    public void AddCoolPoint()
+    {
+        if (!Enemy_Spawner.revoltStarted)
+        {
+            coolPoints++;
+            coolPoints = Mathf.Clamp(coolPoints, 0, coolPointsPerCharge);
         }
     }
 }
