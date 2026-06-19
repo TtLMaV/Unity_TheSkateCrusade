@@ -55,6 +55,13 @@ public class Enemy_Spawner : MonoBehaviour
         // Start Revlot When Enemies Spawned
         if(numberOfEnemies == maxNumberOfEnemies)
             revoltStarted = true;
+
+        //
+        if(revoltStarted)
+        {
+            minSpawnDelay = 0f;
+            maxSpawnDelay = 0.1f;
+        }
     }
 
     private void OnDrawGizmosSelected()

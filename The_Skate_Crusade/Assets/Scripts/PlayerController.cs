@@ -31,6 +31,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Animator leftPoleAnimator;
     [SerializeField] private Animator rightPoleAnimator;
     [SerializeField] private Animator swordAnimator;
+    public static bool inMenu;
+    [SerializeField] private UIController UI;
 
     // Camera set variables
     [Header("Camera")]
@@ -101,6 +103,20 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Do Menu Toggle Button Input
+    public void PlayerMenuInput(InputAction.CallbackContext context)
+    {
+        // Toggle Menu setting on 
+        if (context.performed)
+            inMenu = !inMenu;
+
+        //
+        UI.UpdateMenu();
+        Time.timeScale = inMenu ? 0f : 1f;
+        Cursor.visible = inMenu;
+        Cursor.lockState = inMenu ? CursorLockMode.None : CursorLockMode.Confined;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -116,9 +132,12 @@ public class PlayerController : MonoBehaviour
         pushSFX.volume = 0f;
         brakeSFX.volume = 0f;
 
-        //
+        // Reset Statics
         Health = 100.0f;
         Score = 0;
+        Time.timeScale = 1f;
+        inMenu = false;
+        UI.UpdateMenu();
     }
 
     // Update is called once per frame
